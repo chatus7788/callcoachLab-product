@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { authService } from '../services/authService';
+import { workspaceService } from '../services/workspaceService';
 
 export const useAuthStore = create((set) => ({
   user: authService.getStoredUser(),
@@ -46,6 +47,20 @@ export const useAuthStore = create((set) => ({
   updateUser: (userData) => {
     set({ user: userData });
     localStorage.setItem('user', JSON.stringify(userData));
+  },
+
+  fetchWorkspace: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const workspace = await workspaceService.getMyWorkspace();
+      set({ workspace, isLoading: false });
+      localStorage.setItem('workspace', JSON.stringify(workspace));
+      return workspace;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error?.message || 'Failed to fetch workspace';
+      set({ error: errorMessage, isLoading: false });
+      throw error;
+    }
   },
 
   clearError: () => set({ error: null }),

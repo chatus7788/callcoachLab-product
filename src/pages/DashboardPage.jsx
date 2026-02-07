@@ -1,8 +1,16 @@
+import { useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 
 export function DashboardPage() {
-  const { user, workspace } = useAuthStore();
+  const { user, workspace, fetchWorkspace } = useAuthStore();
+
+  useEffect(() => {
+    // Fetch the current workspace on component mount
+    fetchWorkspace().catch((error) => {
+      console.error('Failed to fetch workspace:', error);
+    });
+  }, [fetchWorkspace]);
 
   const stats = [
     { label: 'Total Users', value: '0', icon: '👥', color: 'bg-blue-500' },
