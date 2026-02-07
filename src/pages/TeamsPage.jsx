@@ -13,7 +13,7 @@ export function TeamsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '' });
   const [errors, setErrors] = useState({});
   
   const { user } = useAuthStore();
@@ -28,10 +28,18 @@ export function TeamsPage() {
   const fetchTeams = async () => {
     try {
       setIsLoading(true);
-      const data = await teamService.getTeams();
-      setTeams(data.teams || []);
+      const response = await teamService.getTeams();
+      // Check if response is already the data array or has nested structure
+      const teamsList = Array.isArray(response) ? response : (response.data || []);
+      // Normalize id to _id for consistency
+      const normalizedTeams = teamsList.map(team => ({
+        ...team,
+        _id: team._id || team.id
+      }));
+      setTeams(normalizedTeams);
     } catch (error) {
       toast.error('Failed to load teams');
+      console.error('Teams fetch error:', error); 
     } finally {
       setIsLoading(false);
     }
@@ -40,10 +48,10 @@ export function TeamsPage() {
   const handleOpenModal = (team = null) => {
     if (team) {
       setEditingTeam(team);
-      setFormData({ name: team.name, description: team.description || '' });
+      setFormData({ name: team.name });
     } else {
       setEditingTeam(null);
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '' });
     }
     setIsModalOpen(true);
     setErrors({});
@@ -52,7 +60,7 @@ export function TeamsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingTeam(null);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '' });
     setErrors({});
   };
 
@@ -110,7 +118,7 @@ export function TeamsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Teams</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Teams ({teams.length})</h2>
           <p className="text-gray-600 mt-1">Manage your workspace teams</p>
         </div>
         {canManageTeams && (
@@ -139,9 +147,6 @@ export function TeamsPage() {
                 <CardTitle>{team.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 text-sm mb-4">
-                  {team.description || 'No description'}
-                </p>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Members:</span>
@@ -197,19 +202,6 @@ export function TeamsPage() {
             error={errors.name}
             placeholder="Sales Team"
           />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows="3"
-              placeholder="Optional team description"
-            />
-          </div>
 
           <div className="flex gap-2 justify-end">
             <Button type="button" variant="ghost" onClick={handleCloseModal}>

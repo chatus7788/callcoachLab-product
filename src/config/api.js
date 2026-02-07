@@ -38,5 +38,5 @@ export const API_ENDPOINTS = {
   GET_AUDIT_LOGS: '/audit-logs',
   
   // CSRF
-  GET_CSRF_TOKEN: '/csrf-token',
+  GET_CSRF_TOKEN: '/csrf/',
 };
