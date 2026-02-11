@@ -10,6 +10,7 @@ import { DashboardLayout } from './components/DashboardLayout';
 import { Toast } from './components/Toast';
 import { useAuthStore } from './store/authStore';
 import './App.css';
+import CallCoach360Setup from './ui/Setup';
 
 function App() {
   const { isAuthenticated } = useAuthStore();
@@ -26,6 +27,11 @@ function App() {
         <Route 
           path="/signup" 
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />} 
+        />
+
+        <Route
+          path='/setup'
+          element={<CallCoach360Setup/>}
         />
 
         {/* Protected Routes */}
