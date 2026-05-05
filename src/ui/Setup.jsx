@@ -37,11 +37,54 @@ export default function CallCoach360Setup() {
   ];
 
   const handleNext = () => {
-    if (currentStep < 5) setCurrentStep(currentStep + 1);
+    if (validateStep()) {
+      if (currentStep < 5) setCurrentStep(currentStep + 1);
+    }
   };
 
   const handlePrev = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const validateStep = () => {
+    switch (currentStep) {
+      case 1:
+        if (!businessTitle.trim()) {
+          alert('Please enter a business title');
+          return false;
+        }
+        return true;
+      case 2:
+        if (!teamManager.trim()) {
+          alert('Please select a team manager');
+          return false;
+        }
+        if (!managerID.trim()) {
+          alert('Please enter manager ID');
+          return false;
+        }
+        if (!agents[0].agentName.trim() || !agents[0].agentID.trim()) {
+          alert('Please fill in all agent details');
+          return false;
+        }
+        return true;
+      case 3:
+        if (!callConnectOption) {
+          alert('Please select a call connection option');
+          return false;
+        }
+        return true;
+      case 4:
+        if (!selectedScoreCard) {
+          alert('Please select a score card');
+          return false;
+        }
+        return true;
+      case 5:
+        return true;
+      default:
+        return true;
+    }
   };
 
   const handleLaunch = () => {
